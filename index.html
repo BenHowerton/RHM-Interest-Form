@@ -12,7 +12,7 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-N71CV6K394');
+      gtag('config', 'G-N71CV6K394', { debug_mode: true });
 
       // Event tracking helpers
       function trackEvent(action, label) {
@@ -191,54 +191,70 @@
     <!-- Engagement & Outbound Link Event Tracking (GA4) -->
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        // Guard if GA not loaded yet
-        const safeGtag = function(){
-          if (typeof gtag === 'function') { gtag.apply(null, arguments); }
-        };
+        const hasGtag = typeof gtag === 'function';
+        const safeGtag = function(){ if (hasGtag) { gtag.apply(null, arguments); } };
 
-        // Interest Form CTA
+        // Helper to ensure event is sent before navigation
+        function trackThenNavigate(evt, eventName, params, navigateFn){
+          if (!hasGtag) { navigateFn(); return; }
+          evt.preventDefault();
+          let navigated = false;
+          const go = () => { if (!navigated) { navigated = true; navigateFn(); } };
+          params = Object.assign({}, params || {}, { event_callback: go, event_timeout: 1500 });
+          safeGtag('event', eventName, params);
+          // Fallback in case callback doesn't fire
+          setTimeout(go, 1600);
+        }
+
+        // Interest Form CTA (opens new tab)
         const interest = document.getElementById('cta-interest-form');
         if (interest) {
-          interest.addEventListener('click', function(){
-            safeGtag('event', 'generate_lead', {
-              source: 'interest_form',
-              method: 'google_form',
-              campaign: 'rhm_site'
-            });
+          interest.addEventListener('click', function(e){
+            trackThenNavigate(
+              e,
+              'generate_lead',
+              { source: 'interest_form', method: 'google_form', campaign: 'rhm_site' },
+              () => window.open(interest.href, '_blank', 'noopener')
+            );
           });
         }
 
-        // Contact Advisor CTA (email)
+        // Contact Advisor CTA (mailto)
         const contact = document.getElementById('cta-contact-advisor');
         if (contact) {
-          contact.addEventListener('click', function(){
-            safeGtag('event', 'contact', {
-              method: 'email',
-              contact_type: 'advisor',
-              campaign: 'rhm_site'
-            });
+          contact.addEventListener('click', function(e){
+            trackThenNavigate(
+              e,
+              'contact',
+              { method: 'email', contact_type: 'advisor', campaign: 'rhm_site' },
+              () => { window.location.href = contact.href; }
+            );
           });
         }
 
-        // Watch on YouTube button
+        // Watch on YouTube button (opens new tab)
         const watch = document.getElementById('watch-youtube-btn');
         if (watch) {
-          watch.addEventListener('click', function(){
-            safeGtag('event', 'select_content', {
-              content_type: 'video',
-              item_id: '3iIiI0UbDmA',
-              link_url: watch.href
-            });
+          watch.addEventListener('click', function(e){
+            trackThenNavigate(
+              e,
+              'select_content',
+              { content_type: 'video', item_id: '3iIiI0UbDmA', link_url: watch.href },
+              () => window.open(watch.href, '_blank', 'noopener')
+            );
           });
         }
 
-        // Generic outbound link tracking (opens in new tab)
+        // Generic outbound link tracking (avoid double-tracking our specific CTAs)
         document.querySelectorAll('a[target="_blank"]').forEach(function(a){
-          a.addEventListener('click', function(){
-            safeGtag('event', 'click', {
-              link_url: a.href,
-              outbound: true
-            });
+          if (a.id === 'cta-interest-form' || a.id === 'watch-youtube-btn') return;
+          a.addEventListener('click', function(e){
+            trackThenNavigate(
+              e,
+              'click',
+              { link_url: a.href, outbound: true },
+              () => window.open(a.href, '_blank', 'noopener')
+            );
           });
         });
       });
