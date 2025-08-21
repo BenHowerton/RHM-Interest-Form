@@ -4,6 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resort & Hospitality Management Program</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N71CV6K394"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-N71CV6K394');
+
+      // Event tracking helpers
+      function trackEvent(action, label) {
+        gtag('event', action, {
+          'event_category': 'engagement',
+          'event_label': label
+        });
+      }
+    </script>
+
     <meta name="description" content="Explore the Resort & Hospitality Management (RHM) program: real industry experience, business + hospitality curriculum, and an in-demand career path." />
 
     <!-- Open Graph / Social -->
@@ -91,7 +110,7 @@
           </div>
           <p class="mt-4 text-sm text-gray-600">*Video placeholder. Add your program intro or promo reel here.</p>
           <div class="mt-6">
-            <a href="https://www.youtube.com/watch?v=3iIiI0UbDmA" target="_blank" rel="noopener" class="inline-flex items-center justify-center bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+            <a id="watch-youtube-btn" href="https://www.youtube.com/watch?v=3iIiI0UbDmA" target="_blank" rel="noopener" onclick="trackEvent('watch_on_youtube','Program Video')" class="inline-flex items-center justify-center bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
               Watch on YouTube
             </a>
           </div>
@@ -105,16 +124,20 @@
           <p class="text-gray-700 mb-8">We’ll send you info about the program, admissions, scholarships, and next steps.</p>
           <div class="flex flex-col sm:flex-row gap-3 justify-center">
             <a
+              id="cta-interest-form"
               href="https://docs.google.com/forms/d/e/1FAIpQLSdSgJmvJUAc6XTNyFHBWtMF_30xJK31rtIqFKSV3DXZhkiIBw/viewform"
               target="_blank"
               rel="noopener"
+              onclick="trackEvent('click_interest_form','CTA')"
               class="inline-flex items-center justify-center bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               aria-label="Fill out the interest form (opens in a new tab)"
             >
               Fill Out the Interest Form
             </a>
             <a
+              id="cta-contact-advisor"
               href="mailto:management@boisestate.edu?subject=RHM Program Inquiry&body=Hello, I would like to learn more about the Resort and Hospitality Management program."
+              onclick="trackEvent('click_contact_advisor','CTA')"
               class="inline-flex items-center justify-center bg-white text-blue-700 hover:text-blue-800 font-semibold px-6 py-3 rounded-lg shadow hover:shadow-md ring-1 ring-blue-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             >
               Contact an advisor
@@ -134,8 +157,8 @@
             <li class="text-gray-300">Resort &amp; Hospitality Management Program</li>
             <li class="text-gray-300">College of Business and Economics</li>
             <li class="text-gray-300">123 Hospitality Hall, Boise, ID 83725</li>
-            <li><a href="mailto:management@boisestate.edu" class="hover:underline">management@boisestate.edu</a></li>
-            <li><a href="tel:+12084261313" class="hover:underline">(208) 426-1313</a></li>
+            <li><a href="mailto:management@boisestate.edu" onclick="trackEvent('click_footer_email','Footer')" class="hover:underline">management@boisestate.edu</a></li>
+            <li><a href="tel:+12084261313" onclick="trackEvent('click_footer_phone','Footer')" class="hover:underline">(208) 426-1313</a></li>
           </ul>
         </div>
 
@@ -143,10 +166,10 @@
         <nav aria-label="Footer">
           <h3 class="text-xl font-bold mb-3 text-white">Quick Links</h3>
           <ul class="space-y-2 text-sm">
-            <li><a href="#cta" class="hover:underline">Apply Now →</a></li>
-            <li><a href="#scholarships" class="hover:underline">Scholarships →</a></li>
-            <li><a href="#tours" class="hover:underline">Schedule a Tour →</a></li>
-            <li><a href="#student-life" class="hover:underline">Student Life →</a></li>
+            <li><a href="#cta" onclick="trackEvent('click_apply_now','Footer')" class="hover:underline">Apply Now →</a></li>
+            <li><a href="#scholarships" onclick="trackEvent('click_scholarships','Footer')" class="hover:underline">Scholarships →</a></li>
+            <li><a href="#tours" onclick="trackEvent('click_schedule_tour','Footer')" class="hover:underline">Schedule a Tour →</a></li>
+            <li><a href="#student-life" onclick="trackEvent('click_student_life','Footer')" class="hover:underline">Student Life →</a></li>
           </ul>
         </nav>
       </div>
@@ -164,6 +187,63 @@
       // Auto year
       document.getElementById('year').textContent = new Date().getFullYear();
     </script>
+
+    <!-- Engagement & Outbound Link Event Tracking (GA4) -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Guard if GA not loaded yet
+        const safeGtag = function(){
+          if (typeof gtag === 'function') { gtag.apply(null, arguments); }
+        };
+
+        // Interest Form CTA
+        const interest = document.getElementById('cta-interest-form');
+        if (interest) {
+          interest.addEventListener('click', function(){
+            safeGtag('event', 'generate_lead', {
+              source: 'interest_form',
+              method: 'google_form',
+              campaign: 'rhm_site'
+            });
+          });
+        }
+
+        // Contact Advisor CTA (email)
+        const contact = document.getElementById('cta-contact-advisor');
+        if (contact) {
+          contact.addEventListener('click', function(){
+            safeGtag('event', 'contact', {
+              method: 'email',
+              contact_type: 'advisor',
+              campaign: 'rhm_site'
+            });
+          });
+        }
+
+        // Watch on YouTube button
+        const watch = document.getElementById('watch-youtube-btn');
+        if (watch) {
+          watch.addEventListener('click', function(){
+            safeGtag('event', 'select_content', {
+              content_type: 'video',
+              item_id: '3iIiI0UbDmA',
+              link_url: watch.href
+            });
+          });
+        }
+
+        // Generic outbound link tracking (opens in new tab)
+        document.querySelectorAll('a[target="_blank"]').forEach(function(a){
+          a.addEventListener('click', function(){
+            safeGtag('event', 'click', {
+              link_url: a.href,
+              outbound: true
+            });
+          });
+        });
+      });
+    </script>
   </body>
 </html>
+
 
